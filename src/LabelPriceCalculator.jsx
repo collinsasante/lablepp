@@ -40,6 +40,8 @@ export default function LabelPriceCalculator() {
 
   const conv = { cm: 0.3937, inch: 1, feet: 12, meter: 39.37 };
 
+  const restrictedUnits = ["Transparent SAV", "Regular SAV", "PP"];
+
   const handleCalculate = () => {
     const wIn = (parseFloat(width) || 0) * conv[unit];
     const hIn = (parseFloat(height) || 0) * conv[unit];
@@ -47,17 +49,26 @@ export default function LabelPriceCalculator() {
     let fp = 0;
 
     if (type === "Transparent SAV") {
-      fp = ((wIn * hIn) / 144) * 9.5; // new formula for Transparent SAV
+      fp = (wIn * hIn) / 9.5;
+    } else if (type === "Regular SAV") {
+      fp = (wIn * hIn) / 8;
     } else {
-      fp = ((wIn * hIn) / 144) * 1.5; // default for other types
+      fp = ((wIn * hIn) / 144) * 1.5; // default for others
     }
 
-    const up = fp * 1.5; // sales price
+    const up = fp * 1.5;
     const tot = up * qty;
 
     setFinalProd(fp);
     setUnitPrice(up);
     setTotal(tot);
+  };
+
+  const getAvailableUnits = () => {
+    if (restrictedUnits.includes(type)) {
+      return ["cm", "inch"];
+    }
+    return Object.keys(conv);
   };
 
   return (
@@ -70,7 +81,15 @@ export default function LabelPriceCalculator() {
           select
           label="Material"
           value={type}
-          onChange={(e) => setType(e.target.value)}
+          onChange={(e) => {
+            setType(e.target.value);
+            if (
+              restrictedUnits.includes(e.target.value) &&
+              (unit === "feet" || unit === "meter")
+            ) {
+              setUnit("cm"); // reset to cm if invalid
+            }
+          }}
         >
           {["Transparent SAV", "Regular SAV", "PP", "Flexy", "PP White"].map(
             (t) => (
@@ -87,7 +106,7 @@ export default function LabelPriceCalculator() {
           value={unit}
           onChange={(e) => setUnit(e.target.value)}
         >
-          {Object.keys(conv).map((u) => (
+          {getAvailableUnits().map((u) => (
             <MenuItem key={u} value={u}>
               {u}
             </MenuItem>
