@@ -43,8 +43,16 @@ export default function LabelPriceCalculator() {
   const handleCalculate = () => {
     const wIn = (parseFloat(width) || 0) * conv[unit];
     const hIn = (parseFloat(height) || 0) * conv[unit];
-    const fp = ((wIn * hIn) / 144) * 1.5;
-    const up = fp * 1.5;
+
+    let fp = 0;
+
+    if (type === "Transparent SAV") {
+      fp = (wIn * hIn) / 9.5; // new formula for Transparent SAV
+    } else {
+      fp = ((wIn * hIn) / 144) * 1.5; // default for other types
+    }
+
+    const up = fp * 1.5; // sales price
     const tot = up * qty;
 
     setFinalProd(fp);
