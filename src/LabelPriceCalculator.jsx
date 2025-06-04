@@ -49,9 +49,9 @@ export default function LabelPriceCalculator() {
     let fp = 0;
 
     if (type === "Transparent SAV") {
-      fp = (wIn * hIn) / 9.5;
+      fp = ((wIn * hIn) / 144) * 9.5;
     } else if (type === "Regular SAV") {
-      fp = (wIn * hIn) / 8;
+      fp = ((wIn * hIn) / 144) * 8;
     } else {
       fp = ((wIn * hIn) / 144) * 1.5; // default for others
     }
