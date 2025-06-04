@@ -52,11 +52,13 @@ export default function LabelPriceCalculator() {
       fp = ((wIn * hIn) / 144) * 9.5;
     } else if (type === "Regular SAV") {
       fp = ((wIn * hIn) / 144) * 8;
+    } else if (type === "PP") {
+      fp = ((wIn * hIn) / 144) * 8;
     } else {
       fp = ((wIn * hIn) / 144) * 1.5; // default for others
     }
 
-    const up = fp * 1.5;
+    const up = type === "PP" ? fp * 2 : fp * 1.5;
     const tot = up * qty;
 
     setFinalProd(fp);
