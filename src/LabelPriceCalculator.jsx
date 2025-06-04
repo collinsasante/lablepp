@@ -8,8 +8,11 @@ import {
   Button,
   Card,
   Typography,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const glassCard = (theme) => css`
   backdrop-filter: blur(20px);
@@ -74,6 +77,15 @@ export default function LabelPriceCalculator() {
     setTotal(tot);
   };
 
+  const handleCopy = () => {
+    const text = `Cost Price: ₵${finalProd.toFixed(
+      2
+    )}\nSales Price: ₵${unitPrice.toFixed(2)}\nTotal: ₵${total.toFixed(
+      2
+    )}\nQuantity: ${qty}`;
+    navigator.clipboard.writeText(text);
+  };
+
   const getAvailableUnits = () => {
     if (type === "Flexy") {
       return ["feet"];
@@ -85,87 +97,103 @@ export default function LabelPriceCalculator() {
   };
 
   return (
-    <Card css={glassCard(theme)}>
+    <Box>
       <Typography variant="h5" gutterBottom>
         Label Price Calculator
       </Typography>
-      <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mb={3}>
-        <TextField
-          select
-          label="Material"
-          value={type}
-          onChange={(e) => {
-            setType(e.target.value);
-            if (
-              (e.target.value === "Flexy" && unit !== "feet") ||
-              (restrictedUnits.includes(e.target.value) &&
-                (unit === "feet" || unit === "meter"))
-            ) {
-              setUnit("cm");
-              if (e.target.value === "Flexy") setUnit("feet");
-            }
-          }}
-        >
-          {["Transparent SAV", "Regular SAV", "PP", "Flexy", "PP White"].map(
-            (t) => (
-              <MenuItem key={t} value={t}>
-                {t}
-              </MenuItem>
-            )
-          )}
-        </TextField>
 
-        <TextField
-          select
-          label="Unit"
-          value={unit}
-          onChange={(e) => setUnit(e.target.value)}
-        >
-          {getAvailableUnits().map((u) => (
-            <MenuItem key={u} value={u}>
-              {u}
-            </MenuItem>
-          ))}
-        </TextField>
-
-        <TextField
-          label="Width"
-          value={width}
-          onChange={(e) => setWidth(e.target.value)}
-        />
-        <TextField
-          label="Height"
-          value={height}
-          onChange={(e) => setHeight(e.target.value)}
-        />
-        <TextField
-          label="Quantity"
-          type="number"
-          value={qty}
-          onChange={(e) => setQty(+e.target.value)}
-        />
-      </Box>
-
-      <Button css={neumorphicButton(theme)} onClick={handleCalculate}>
-        Calculate
-      </Button>
-
-      <AnimatePresence>
-        {total !== null && (
-          <motion.div
-            key={total}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+      <Card css={glassCard(theme)}>
+        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mb={3}>
+          <TextField
+            select
+            label="Material"
+            value={type}
+            onChange={(e) => {
+              setType(e.target.value);
+              if (
+                (e.target.value === "Flexy" && unit !== "feet") ||
+                (restrictedUnits.includes(e.target.value) &&
+                  (unit === "feet" || unit === "meter"))
+              ) {
+                setUnit("cm");
+                if (e.target.value === "Flexy") setUnit("feet");
+              }
+            }}
           >
-            <Box mt={4}>
-              <Typography>Final Prod: {finalProd.toFixed(2)}</Typography>
-              <Typography>Unit Price: ₵{unitPrice.toFixed(2)}</Typography>
-              <Typography>Total: ₵{total.toFixed(2)}</Typography>
-            </Box>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </Card>
+            {["Transparent SAV", "Regular SAV", "PP", "Flexy", "PP White"].map(
+              (t) => (
+                <MenuItem key={t} value={t}>
+                  {t}
+                </MenuItem>
+              )
+            )}
+          </TextField>
+
+          <TextField
+            select
+            label="Unit"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+          >
+            {getAvailableUnits().map((u) => (
+              <MenuItem key={u} value={u}>
+                {u}
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            label="Width"
+            value={width}
+            onChange={(e) => setWidth(e.target.value)}
+          />
+          <TextField
+            label="Height"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+          />
+          <TextField
+            label="Quantity"
+            type="number"
+            value={qty}
+            onChange={(e) => setQty(+e.target.value)}
+          />
+        </Box>
+
+        <Button css={neumorphicButton(theme)} onClick={handleCalculate}>
+          Calculate
+        </Button>
+
+        <AnimatePresence>
+          {total !== null && (
+            <motion.div
+              key={total}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Box mt={4} display="flex" alignItems="center">
+                <Box flex={1}>
+                  <Typography sx={{ color: "#1976d2", fontWeight: 600 }}>
+                    Cost Price: ₵{finalProd.toFixed(2)}
+                  </Typography>
+                  <Typography sx={{ color: "#2e7d32", fontWeight: 600 }}>
+                    Sales Price: ₵{unitPrice.toFixed(2)}
+                  </Typography>
+                  <Typography>Total: ₵{total.toFixed(2)}</Typography>
+                  <Typography>Quantity: {qty}</Typography>
+                </Box>
+
+                <Tooltip title="Copy to clipboard">
+                  <IconButton onClick={handleCopy}>
+                    <ContentCopyIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Card>
+    </Box>
   );
 }
