@@ -1,217 +1,105 @@
 /** @jsxImportSource @emotion/react */
 import React, { useState } from "react";
-import { css, useTheme, ThemeProvider, createTheme } from "@emotion/react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { css, useTheme } from "@emotion/react";
 import {
   Box,
-  MenuItem,
   TextField,
-  Button,
-  Card,
   Typography,
-  Tooltip,
-  IconButton,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976d2", // blue
+      main: "#1976d2",
     },
   },
 });
 
-const glassCard = (theme) => css`
-  backdrop-filter: blur(20px);
-  background: ${theme.palette.background.paper};
-  border-radius: ${theme.shape.borderRadius}px;
-  box-shadow: ${theme.shadows[1]};
-  padding: 24px;
+const containerStyle = css`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 400px;
+  margin: 50px auto;
 `;
 
-export default function LabelPriceCalculator() {
-  const muiTheme = useTheme();
-  const [type, setType] = useState("Transparent SAV");
-  const [unit, setUnit] = useState("cm");
+function LabelPriceCalculator() {
+  const [length, setLength] = useState("");
   const [width, setWidth] = useState("");
-  const [height, setHeight] = useState("");
-  const [qty, setQty] = useState(1);
-
-  const [finalProd, setFinalProd] = useState(null);
-  const [unitPrice, setUnitPrice] = useState(null);
-  const [total, setTotal] = useState(null);
-
-  const conv = { cm: 0.3937, inch: 1, feet: 12, meter: 39.37 };
-  const restrictedUnits = ["Transparent SAV", "Regular SAV", "PP"];
+  const [material, setMaterial] = useState("");
+  const [price, setPrice] = useState(null);
+  const muiTheme = useTheme();
 
   const handleCalculate = () => {
-    const wIn = (parseFloat(width) || 0) * conv[unit];
-    const hIn = (parseFloat(height) || 0) * conv[unit];
-
-    let fp = 0;
-    let up = 0;
-
-    if (type === "Transparent SAV") {
-      fp = ((wIn * hIn) / 144) * 9.5;
-      up = fp * 1.5;
-    } else if (type === "Regular SAV") {
-      fp = ((wIn * hIn) / 144) * 8;
-      up = fp * 1.5;
-    } else if (type === "PP") {
-      fp = ((wIn * hIn) / 144) * 8;
-      up = fp * 2;
-    } else if (type === "Flexy") {
-      const wFt = ((parseFloat(width) || 0) * conv[unit]) / 12;
-      const hFt = ((parseFloat(height) || 0) * conv[unit]) / 12;
-      fp = wFt * hFt * 2.7;
-      up = wFt * hFt * 4;
-    } else {
-      fp = ((wIn * hIn) / 144) * 1.5;
-      up = fp * 1.5;
+    if (!length || !width || !material) {
+      alert("Please fill out all fields.");
+      return;
     }
 
-    const tot = up * qty;
+    const area = parseFloat(length) * parseFloat(width);
+    let rate = 0;
 
-    setFinalProd(fp);
-    setUnitPrice(up);
-    setTotal(tot);
-  };
-
-  const handleCopy = () => {
-    const text = `Sales Price: ₵${unitPrice.toFixed(
-      2
-    )}\nQuantity: ${qty}\nTotal: ₵${total.toFixed(2)}`;
-    navigator.clipboard.writeText(text);
-  };
-
-  const getAvailableUnits = () => {
-    if (type === "Flexy") {
-      return ["feet"];
+    switch (material) {
+      case "paper":
+        rate = 0.05;
+        break;
+      case "vinyl":
+        rate = 0.1;
+        break;
+      case "polyester":
+        rate = 0.15;
+        break;
+      default:
+        rate = 0;
     }
-    if (restrictedUnits.includes(type)) {
-      return ["cm", "inch"];
-    }
-    return Object.keys(conv);
+
+    setPrice((area * rate).toFixed(2));
   };
 
   return (
     <ThemeProvider theme={theme}>
-      <Box>
-        <Typography variant="h5" gutterBottom>
-          Label Price Calculator
-        </Typography>
-
-        <Card css={glassCard(muiTheme)}>
-          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mb={3}>
-            <TextField
-              select
-              label="Material"
-              value={type}
-              onChange={(e) => {
-                setType(e.target.value);
-                if (
-                  (e.target.value === "Flexy" && unit !== "feet") ||
-                  (restrictedUnits.includes(e.target.value) &&
-                    (unit === "feet" || unit === "meter"))
-                ) {
-                  setUnit("cm");
-                  if (e.target.value === "Flexy") setUnit("feet");
-                }
-              }}
-            >
-              {[
-                "Transparent SAV",
-                "Regular SAV",
-                "PP",
-                "Flexy",
-                "PP White",
-              ].map((t) => (
-                <MenuItem key={t} value={t}>
-                  {t}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              select
-              label="Unit"
-              value={unit}
-              onChange={(e) => setUnit(e.target.value)}
-            >
-              {getAvailableUnits().map((u) => (
-                <MenuItem key={u} value={u}>
-                  {u}
-                </MenuItem>
-              ))}
-            </TextField>
-
-            <TextField
-              label="Width"
-              value={width}
-              onChange={(e) => setWidth(e.target.value)}
-            />
-            <TextField
-              label="Height"
-              value={height}
-              onChange={(e) => setHeight(e.target.value)}
-            />
-            <TextField
-              label="Quantity"
-              type="number"
-              value={qty}
-              onChange={(e) => setQty(+e.target.value)}
-            />
-          </Box>
-
-          <Button variant="contained" onClick={handleCalculate}>
-            Calculate
-          </Button>
-
-          <AnimatePresence>
-            {total !== null && (
-              <motion.div
-                key={total}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <Box mt={4}>
-                  <Typography sx={{ color: "#000", fontWeight: 600 }}>
-                    Cost Price: ₵{finalProd.toFixed(2)}
-                  </Typography>
-
-                  <Card
-                    css={css`
-                      margin-top: 16px;
-                      padding: 16px;
-                      background: ${muiTheme.palette.background.default};
-                      display: flex;
-                      align-items: center;
-                      justify-content: space-between;
-                      box-shadow: ${muiTheme.shadows[2]};
-                    `}
-                  >
-                    <Box>
-                      <Typography sx={{ fontWeight: 600, color: "#1976d2" }}>
-                        Sales Price: ₵{unitPrice.toFixed(2)}
-                      </Typography>
-                      <Typography>Quantity: {qty}</Typography>
-                      <Typography>Total: ₵{total.toFixed(2)}</Typography>
-                    </Box>
-
-                    <Tooltip title="Copy to clipboard">
-                      <IconButton onClick={handleCopy}>
-                        <ContentCopyIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Card>
-                </Box>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </Card>
+      <Box css={containerStyle}>
+        <Typography variant="h4">Label Price Calculator</Typography>
+        <TextField
+          label="Length (in inches)"
+          value={length}
+          onChange={(e) => setLength(e.target.value)}
+          type="number"
+          fullWidth
+        />
+        <TextField
+          label="Width (in inches)"
+          value={width}
+          onChange={(e) => setWidth(e.target.value)}
+          type="number"
+          fullWidth
+        />
+        <FormControl fullWidth>
+          <InputLabel>Material</InputLabel>
+          <Select
+            value={material}
+            onChange={(e) => setMaterial(e.target.value)}
+          >
+            <MenuItem value="paper">Paper</MenuItem>
+            <MenuItem value="vinyl">Vinyl</MenuItem>
+            <MenuItem value="polyester">Polyester</MenuItem>
+          </Select>
+        </FormControl>
+        <Button variant="contained" color="primary" onClick={handleCalculate}>
+          Calculate
+        </Button>
+        {price && (
+          <Typography variant="h6">Estimated Price: ${price}</Typography>
+        )}
       </Box>
     </ThemeProvider>
   );
 }
+
+export default LabelPriceCalculator;
