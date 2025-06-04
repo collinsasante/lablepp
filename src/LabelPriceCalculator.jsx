@@ -91,7 +91,7 @@ export default function LabelPriceCalculator() {
     if (type === "Flexy") {
       return ["feet"];
     }
-    if (restrictedUnits.includes(type)) {
+    if (restrictedUnits.includes(type) || type === "PP Transparent(White)") {
       return ["cm", "inch"];
     }
     return Object.keys(conv);
@@ -114,18 +114,19 @@ export default function LabelPriceCalculator() {
             select
             label="Material"
             value={type}
-            size="small"
             onChange={(e) => {
               setType(e.target.value);
               if (
                 (e.target.value === "Flexy" && unit !== "feet") ||
-                (restrictedUnits.includes(e.target.value) &&
+                ((restrictedUnits.includes(e.target.value) ||
+                  e.target.value === "PP Transparent(White)") &&
                   (unit === "feet" || unit === "meter"))
               ) {
-                setUnit("cm");
-                if (e.target.value === "Flexy") setUnit("feet");
+                setUnit(e.target.value === "Flexy" ? "feet" : "cm");
               }
             }}
+            variant="outlined"
+            size="small"
             sx={fontStyle}
           >
             {[
@@ -146,6 +147,8 @@ export default function LabelPriceCalculator() {
             label="Unit"
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
+            variant="outlined"
+            size="small"
             sx={fontStyle}
           >
             {getAvailableUnits().map((u) => (
@@ -159,19 +162,27 @@ export default function LabelPriceCalculator() {
             label="Width"
             value={width}
             onChange={(e) => setWidth(e.target.value)}
+            variant="outlined"
+            size="small"
             sx={fontStyle}
           />
+
           <TextField
             label="Height"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
+            variant="outlined"
+            size="small"
             sx={fontStyle}
           />
+
           <TextField
             label="Quantity"
             type="number"
             value={qty}
             onChange={(e) => setQty(+e.target.value)}
+            variant="outlined"
+            size="small"
             sx={fontStyle}
           />
         </Box>
@@ -188,46 +199,56 @@ export default function LabelPriceCalculator() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <br />
-              <Box>
-                <Typography sx={{ ...fontStyle, fontWeight: 600 }}>
-                  Cost Price: ₵{finalProd.toFixed(2)}
-                </Typography>
-              </Box>
-              <Card
-                css={glassCard(theme)}
-                sx={{
-                  mt: 4,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  gap: 2,
-                }}
-              >
-                <Box>
-                  <Typography
-                    sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
-                  >
-                    Quantity: {qty}
+              <Box sx={{ mt: 3 }}>
+                <Card
+                  css={glassCard(theme)}
+                  sx={{
+                    width: "200px",
+                    mb: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography sx={{ ...fontStyle, fontWeight: 600 }}>
+                    Cost Price: ₵{finalProd.toFixed(2)}
                   </Typography>
-                  <Typography
-                    sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
-                  >
-                    Unit Price: ₵{unitPrice.toFixed(2)}
-                  </Typography>
-                  <Typography
-                    sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
-                  >
-                    Total: ₵{total.toFixed(2)}
-                  </Typography>
-                </Box>
+                </Card>
 
-                <Tooltip title="Copy to clipboard">
-                  <IconButton onClick={handleCopy}>
-                    <ContentCopyIcon />
-                  </IconButton>
-                </Tooltip>
-              </Card>
+                <Card
+                  css={glassCard(theme)}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
+                  <Box>
+                    <Typography
+                      sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                    >
+                      Quantity: {qty}
+                    </Typography>
+                    <Typography
+                      sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                    >
+                      Unit Price: ₵{unitPrice.toFixed(2)}
+                    </Typography>
+                    <Typography
+                      sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                    >
+                      Total: ₵{total.toFixed(2)}
+                    </Typography>
+                  </Box>
+
+                  <Tooltip title="Copy to clipboard">
+                    <IconButton onClick={handleCopy}>
+                      <ContentCopyIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Card>
+              </Box>
             </motion.div>
           )}
         </AnimatePresence>
