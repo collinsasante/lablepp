@@ -65,7 +65,7 @@ export default function LabelPriceCalculator() {
       const hFt = ((parseFloat(height) || 0) * conv[unit]) / 12;
       fp = wFt * hFt * 2.7;
       up = wFt * hFt * 4;
-    } else if (type === "PP") {
+    } else if (type === "PP Transparent(White)") {
       fp = ((wIn * hIn) / 144) * 16;
       up = fp * 2;
     } else {
