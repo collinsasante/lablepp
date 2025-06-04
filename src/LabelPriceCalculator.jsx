@@ -61,7 +61,7 @@ export default function LabelPriceCalculator() {
       const wFt = ((parseFloat(width) || 0) * conv[unit]) / 12;
       const hFt = ((parseFloat(height) || 0) * conv[unit]) / 12;
       fp = wFt * hFt * 2.7;
-      up = fp * 4;
+      up = wFt * hFt * 4;
     } else {
       fp = ((wIn * hIn) / 144) * 1.5;
       up = fp * 1.5;
