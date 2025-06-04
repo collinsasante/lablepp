@@ -3,7 +3,7 @@ import { createTheme } from "@mui/material/styles";
 
 const theme = createTheme({
   palette: {
-    primary: { main: "#4F46E5" },
+    primary: { main: "#1976d2" },
     background: {
       default: "#F3F4F6",
       paper: "rgba(255,255,255,0.2)", // used in glassCard only

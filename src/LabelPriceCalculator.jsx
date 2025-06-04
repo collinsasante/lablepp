@@ -81,11 +81,9 @@ export default function LabelPriceCalculator() {
   };
 
   const handleCopy = () => {
-    const text = `Cost Price: ₵${finalProd.toFixed(
+    const text = `\nSales Price: ₵${unitPrice.toFixed(
       2
-    )}\nSales Price: ₵${unitPrice.toFixed(2)}\nTotal: ₵${total.toFixed(
-      2
-    )}\nQuantity: ${qty}`;
+    )}\nTotal: ₵${total.toFixed(2)}\nQuantity: ${qty}`;
     navigator.clipboard.writeText(text);
   };
 
@@ -97,6 +95,11 @@ export default function LabelPriceCalculator() {
       return ["cm", "inch"];
     }
     return Object.keys(conv);
+  };
+
+  const fontStyle = {
+    fontFamily: "Arial, sans-serif",
+    fontSize: "0.9rem",
   };
 
   return (
@@ -111,6 +114,7 @@ export default function LabelPriceCalculator() {
             select
             label="Material"
             value={type}
+            size="small"
             onChange={(e) => {
               setType(e.target.value);
               if (
@@ -122,6 +126,7 @@ export default function LabelPriceCalculator() {
                 if (e.target.value === "Flexy") setUnit("feet");
               }
             }}
+            sx={fontStyle}
           >
             {[
               "Transparent SAV",
@@ -130,7 +135,7 @@ export default function LabelPriceCalculator() {
               "Flexy",
               "PP Transparent(White)",
             ].map((t) => (
-              <MenuItem key={t} value={t}>
+              <MenuItem key={t} value={t} sx={fontStyle}>
                 {t}
               </MenuItem>
             ))}
@@ -141,9 +146,10 @@ export default function LabelPriceCalculator() {
             label="Unit"
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
+            sx={fontStyle}
           >
             {getAvailableUnits().map((u) => (
-              <MenuItem key={u} value={u}>
+              <MenuItem key={u} value={u} sx={fontStyle}>
                 {u}
               </MenuItem>
             ))}
@@ -153,17 +159,20 @@ export default function LabelPriceCalculator() {
             label="Width"
             value={width}
             onChange={(e) => setWidth(e.target.value)}
+            sx={fontStyle}
           />
           <TextField
             label="Height"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
+            sx={fontStyle}
           />
           <TextField
             label="Quantity"
             type="number"
             value={qty}
             onChange={(e) => setQty(+e.target.value)}
+            sx={fontStyle}
           />
         </Box>
 
@@ -179,6 +188,12 @@ export default function LabelPriceCalculator() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
+              <br />
+              <Box>
+                <Typography sx={{ ...fontStyle, fontWeight: 600 }}>
+                  Cost Price: ₵{finalProd.toFixed(2)}
+                </Typography>
+              </Box>
               <Card
                 css={glassCard(theme)}
                 sx={{
@@ -190,16 +205,19 @@ export default function LabelPriceCalculator() {
                 }}
               >
                 <Box>
-                  <Typography sx={{ color: "", fontWeight: 600 }}>
-                    Cost Price: ₵{finalProd.toFixed(2)}
-                  </Typography>
-                  <Typography sx={{ color: "#1976d2", fontWeight: 600 }}>
+                  <Typography
+                    sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                  >
                     Quantity: {qty}
                   </Typography>
-                  <Typography sx={{ color: "#1976d2", fontWeight: 600 }}>
-                    Sales Price: ₵{unitPrice.toFixed(2)}
+                  <Typography
+                    sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                  >
+                    Unit Price: ₵{unitPrice.toFixed(2)}
                   </Typography>
-                  <Typography sx={{ color: "#1976d2", fontWeight: 600 }}>
+                  <Typography
+                    sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                  >
                     Total: ₵{total.toFixed(2)}
                   </Typography>
                 </Box>
