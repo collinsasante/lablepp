@@ -39,7 +39,6 @@ export default function LabelPriceCalculator() {
   const [total, setTotal] = useState(null);
 
   const conv = { cm: 0.3937, inch: 1, feet: 12, meter: 39.37 };
-
   const restrictedUnits = ["Transparent SAV", "Regular SAV", "PP"];
 
   const handleCalculate = () => {
@@ -47,18 +46,27 @@ export default function LabelPriceCalculator() {
     const hIn = (parseFloat(height) || 0) * conv[unit];
 
     let fp = 0;
+    let up = 0;
 
     if (type === "Transparent SAV") {
       fp = ((wIn * hIn) / 144) * 9.5;
+      up = fp * 1.5;
     } else if (type === "Regular SAV") {
       fp = ((wIn * hIn) / 144) * 8;
+      up = fp * 1.5;
     } else if (type === "PP") {
       fp = ((wIn * hIn) / 144) * 8;
+      up = fp * 2;
+    } else if (type === "Flexy") {
+      const wFt = ((parseFloat(width) || 0) * conv[unit]) / 12;
+      const hFt = ((parseFloat(height) || 0) * conv[unit]) / 12;
+      fp = wFt * hFt * 2.7;
+      up = fp * 4;
     } else {
-      fp = ((wIn * hIn) / 144) * 1.5; // default for others
+      fp = ((wIn * hIn) / 144) * 1.5;
+      up = fp * 1.5;
     }
 
-    const up = type === "PP" ? fp * 2 : fp * 1.5;
     const tot = up * qty;
 
     setFinalProd(fp);
@@ -67,6 +75,9 @@ export default function LabelPriceCalculator() {
   };
 
   const getAvailableUnits = () => {
+    if (type === "Flexy") {
+      return ["feet"];
+    }
     if (restrictedUnits.includes(type)) {
       return ["cm", "inch"];
     }
@@ -86,10 +97,12 @@ export default function LabelPriceCalculator() {
           onChange={(e) => {
             setType(e.target.value);
             if (
-              restrictedUnits.includes(e.target.value) &&
-              (unit === "feet" || unit === "meter")
+              (e.target.value === "Flexy" && unit !== "feet") ||
+              (restrictedUnits.includes(e.target.value) &&
+                (unit === "feet" || unit === "meter"))
             ) {
-              setUnit("cm"); // reset to cm if invalid
+              setUnit("cm");
+              if (e.target.value === "Flexy") setUnit("feet");
             }
           }}
         >
