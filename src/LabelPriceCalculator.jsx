@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React, { useState } from "react";
-import { css, useTheme } from "@emotion/react";
+import { css, useTheme, ThemeProvider, createTheme } from "@emotion/react";
 import {
   Box,
   MenuItem,
@@ -14,6 +14,14 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#1976d2", // blue
+    },
+  },
+});
+
 const glassCard = (theme) => css`
   backdrop-filter: blur(20px);
   background: ${theme.palette.background.paper};
@@ -22,15 +30,8 @@ const glassCard = (theme) => css`
   padding: 24px;
 `;
 
-const neumorphicButton = (theme) => css`
-  box-shadow: ${theme.shadows[2]}, ${theme.shadows[1]};
-  border-radius: ${theme.shape.borderRadius}px;
-  padding: 12px 24px;
-  text-transform: none;
-`;
-
 export default function LabelPriceCalculator() {
-  const theme = useTheme();
+  const muiTheme = useTheme();
   const [type, setType] = useState("Transparent SAV");
   const [unit, setUnit] = useState("cm");
   const [width, setWidth] = useState("");
@@ -78,11 +79,9 @@ export default function LabelPriceCalculator() {
   };
 
   const handleCopy = () => {
-    const text = `Cost Price: ₵${finalProd.toFixed(
+    const text = `Sales Price: ₵${unitPrice.toFixed(
       2
-    )}\nSales Price: ₵${unitPrice.toFixed(2)}\nTotal: ₵${total.toFixed(
-      2
-    )}\nQuantity: ${qty}`;
+    )}\nQuantity: ${qty}\nTotal: ₵${total.toFixed(2)}`;
     navigator.clipboard.writeText(text);
   };
 
@@ -97,103 +96,122 @@ export default function LabelPriceCalculator() {
   };
 
   return (
-    <Box>
-      <Typography variant="h5" gutterBottom>
-        Label Price Calculator
-      </Typography>
+    <ThemeProvider theme={theme}>
+      <Box>
+        <Typography variant="h5" gutterBottom>
+          Label Price Calculator
+        </Typography>
 
-      <Card css={glassCard(theme)}>
-        <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mb={3}>
-          <TextField
-            select
-            label="Material"
-            value={type}
-            onChange={(e) => {
-              setType(e.target.value);
-              if (
-                (e.target.value === "Flexy" && unit !== "feet") ||
-                (restrictedUnits.includes(e.target.value) &&
-                  (unit === "feet" || unit === "meter"))
-              ) {
-                setUnit("cm");
-                if (e.target.value === "Flexy") setUnit("feet");
-              }
-            }}
-          >
-            {["Transparent SAV", "Regular SAV", "PP", "Flexy", "PP White"].map(
-              (t) => (
+        <Card css={glassCard(muiTheme)}>
+          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={2} mb={3}>
+            <TextField
+              select
+              label="Material"
+              value={type}
+              onChange={(e) => {
+                setType(e.target.value);
+                if (
+                  (e.target.value === "Flexy" && unit !== "feet") ||
+                  (restrictedUnits.includes(e.target.value) &&
+                    (unit === "feet" || unit === "meter"))
+                ) {
+                  setUnit("cm");
+                  if (e.target.value === "Flexy") setUnit("feet");
+                }
+              }}
+            >
+              {[
+                "Transparent SAV",
+                "Regular SAV",
+                "PP",
+                "Flexy",
+                "PP White",
+              ].map((t) => (
                 <MenuItem key={t} value={t}>
                   {t}
                 </MenuItem>
-              )
-            )}
-          </TextField>
+              ))}
+            </TextField>
 
-          <TextField
-            select
-            label="Unit"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-          >
-            {getAvailableUnits().map((u) => (
-              <MenuItem key={u} value={u}>
-                {u}
-              </MenuItem>
-            ))}
-          </TextField>
-
-          <TextField
-            label="Width"
-            value={width}
-            onChange={(e) => setWidth(e.target.value)}
-          />
-          <TextField
-            label="Height"
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-          />
-          <TextField
-            label="Quantity"
-            type="number"
-            value={qty}
-            onChange={(e) => setQty(+e.target.value)}
-          />
-        </Box>
-
-        <Button css={neumorphicButton(theme)} onClick={handleCalculate}>
-          Calculate
-        </Button>
-
-        <AnimatePresence>
-          {total !== null && (
-            <motion.div
-              key={total}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+            <TextField
+              select
+              label="Unit"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
             >
-              <Box mt={4} display="flex" alignItems="center">
-                <Box flex={1}>
-                  <Typography sx={{ color: "#1976d2", fontWeight: 600 }}>
+              {getAvailableUnits().map((u) => (
+                <MenuItem key={u} value={u}>
+                  {u}
+                </MenuItem>
+              ))}
+            </TextField>
+
+            <TextField
+              label="Width"
+              value={width}
+              onChange={(e) => setWidth(e.target.value)}
+            />
+            <TextField
+              label="Height"
+              value={height}
+              onChange={(e) => setHeight(e.target.value)}
+            />
+            <TextField
+              label="Quantity"
+              type="number"
+              value={qty}
+              onChange={(e) => setQty(+e.target.value)}
+            />
+          </Box>
+
+          <Button variant="contained" onClick={handleCalculate}>
+            Calculate
+          </Button>
+
+          <AnimatePresence>
+            {total !== null && (
+              <motion.div
+                key={total}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <Box mt={4}>
+                  <Typography sx={{ color: "#000", fontWeight: 600 }}>
                     Cost Price: ₵{finalProd.toFixed(2)}
                   </Typography>
-                  <Typography sx={{ color: "#2e7d32", fontWeight: 600 }}>
-                    Sales Price: ₵{unitPrice.toFixed(2)}
-                  </Typography>
-                  <Typography>Total: ₵{total.toFixed(2)}</Typography>
-                  <Typography>Quantity: {qty}</Typography>
-                </Box>
 
-                <Tooltip title="Copy to clipboard">
-                  <IconButton onClick={handleCopy}>
-                    <ContentCopyIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Card>
-    </Box>
+                  <Card
+                    css={css`
+                      margin-top: 16px;
+                      padding: 16px;
+                      background: ${muiTheme.palette.background.default};
+                      display: flex;
+                      align-items: center;
+                      justify-content: space-between;
+                      box-shadow: ${muiTheme.shadows[2]};
+                    `}
+                  >
+                    <Box>
+                      <Typography sx={{ fontWeight: 600, color: "#1976d2" }}>
+                        Sales Price: ₵{unitPrice.toFixed(2)}
+                      </Typography>
+                      <Typography>Quantity: {qty}</Typography>
+                      <Typography>Total: ₵{total.toFixed(2)}</Typography>
+                    </Box>
+
+                    <Tooltip title="Copy to clipboard">
+                      <IconButton onClick={handleCopy}>
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </Card>
+                </Box>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
+      </Box>
+    </ThemeProvider>
   );
 }
