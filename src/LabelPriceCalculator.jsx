@@ -41,7 +41,8 @@ export default function LabelPriceCalculator() {
   const [unitPrice, setUnitPrice] = useState(null);
   const [total, setTotal] = useState(null);
 
-  const conv = { cm: 0.3937, inch: 1, feet: 12, meter: 39.37 };
+  // changed 'inch' to 'inches' here:
+  const conv = { cm: 0.3937, inches: 1, feet: 12, meter: 39.37 };
   const restrictedUnits = ["Transparent SAV", "Regular SAV", "PP"];
 
   const handleCalculate = () => {
