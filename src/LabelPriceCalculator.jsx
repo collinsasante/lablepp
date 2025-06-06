@@ -33,7 +33,7 @@ export default function LabelPriceCalculator() {
   const theme = useTheme();
   const [type, setType] = useState("Transparent SAV");
   const [unit, setUnit] = useState("cm");
-  const [width, setWidth] = useState("");
+  const [length, setLength] = useState("");
   const [height, setHeight] = useState("");
   const [qty, setQty] = useState(1);
 
@@ -45,7 +45,7 @@ export default function LabelPriceCalculator() {
   const restrictedUnits = ["Transparent SAV", "Regular SAV", "PP"];
 
   const handleCalculate = () => {
-    const wIn = (parseFloat(width) || 0) * conv[unit];
+    const wIn = (parseFloat(length) || 0) * conv[unit];
     const hIn = (parseFloat(height) || 0) * conv[unit];
 
     let fp = 0;
@@ -61,7 +61,7 @@ export default function LabelPriceCalculator() {
       fp = ((wIn * hIn) / 144) * 8;
       up = fp * 2;
     } else if (type === "Flexy") {
-      const wFt = ((parseFloat(width) || 0) * conv[unit]) / 12;
+      const wFt = ((parseFloat(length) || 0) * conv[unit]) / 12;
       const hFt = ((parseFloat(height) || 0) * conv[unit]) / 12;
       fp = wFt * hFt * 2.7;
       up = wFt * hFt * 4;
@@ -81,9 +81,9 @@ export default function LabelPriceCalculator() {
   };
 
   const handleCopy = () => {
-    const text = `\nSales Price: ₵${unitPrice.toFixed(
+    const text = `Material: ${type}\nDimension: ${length} × ${height} ${unit}\nQuantity: ${qty}\nSales Price: ₵${unitPrice.toFixed(
       2
-    )}\nTotal: ₵${total.toFixed(2)}\nQuantity: ${qty}`;
+    )}\nTotal: ₵${total.toFixed(2)}`;
     navigator.clipboard.writeText(text);
   };
 
@@ -159,9 +159,9 @@ export default function LabelPriceCalculator() {
           </TextField>
 
           <TextField
-            label="Width"
-            value={width}
-            onChange={(e) => setWidth(e.target.value)}
+            label="Length"
+            value={length}
+            onChange={(e) => setLength(e.target.value)}
             variant="outlined"
             size="small"
             sx={fontStyle}
@@ -225,6 +225,24 @@ export default function LabelPriceCalculator() {
                   }}
                 >
                   <Box>
+                    <Typography
+                      sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
+                    >
+                      Material: {type}
+                    </Typography>
+
+                    {total !== null && (
+                      <Typography
+                        sx={{
+                          ...fontStyle,
+                          fontWeight: 600,
+                          color: "#1976d2",
+                        }}
+                      >
+                        Dimension: {length} × {height} {unit}
+                      </Typography>
+                    )}
+
                     <Typography
                       sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
                     >
