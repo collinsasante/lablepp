@@ -92,7 +92,7 @@ export default function LabelPriceCalculator() {
       return ["feet"];
     }
     if (restrictedUnits.includes(type) || type === "PP Transparent(White)") {
-      return ["cm", "inch"];
+      return ["cm", "inches"];
     }
     return Object.keys(conv);
   };
@@ -228,7 +228,7 @@ export default function LabelPriceCalculator() {
                     <Typography
                       sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
                     >
-                      Material: {type}
+                      Material Type: {type}
                     </Typography>
 
                     {total !== null && (
@@ -239,14 +239,14 @@ export default function LabelPriceCalculator() {
                           color: "#1976d2",
                         }}
                       >
-                        Dimension: {length} × {height} {unit}
+                        Label Size: {length} × {height} {unit}
                       </Typography>
                     )}
 
                     <Typography
                       sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
                     >
-                      Quantity: {qty}
+                      Quantity: {qty} pcs
                     </Typography>
                     <Typography
                       sx={{ ...fontStyle, fontWeight: 600, color: "#1976d2" }}
